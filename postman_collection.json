@@ -1,0 +1,58 @@
+{
+  "info": {
+    "name": "Užduočių REST API",
+    "description": "Paleiskite PHP serverį ir vykdykite užklausas iš eilės.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [{ "key": "baseUrl", "value": "http://127.0.0.1:8000" }],
+  "item": [
+    {
+      "name": "Sąrašas",
+      "request": { "method": "GET", "url": "{{baseUrl}}/tasks" }
+    },
+    {
+      "name": "Sukurti",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"title\":\"Pirkti pieno\",\"done\":false}" },
+        "url": "{{baseUrl}}/tasks"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('Sukurta: 201', () => pm.response.to.have.status(201));",
+            "pm.collectionVariables.set('taskId', pm.response.json().id);"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "Viena užduotis",
+      "request": { "method": "GET", "url": "{{baseUrl}}/tasks/{{taskId}}" },
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": ["pm.test('Rasta: 200', () => pm.response.to.have.status(200));"] }
+      }]
+    },
+    {
+      "name": "Pakeisti",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"title\":\"Pirkti duonos\",\"done\":true}" },
+        "url": "{{baseUrl}}/tasks/{{taskId}}"
+      }
+    },
+    {
+      "name": "Ištrinti",
+      "request": { "method": "DELETE", "url": "{{baseUrl}}/tasks/{{taskId}}" },
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": ["pm.test('Ištrinta: 204', () => pm.response.to.have.status(204));"] }
+      }]
+    }
+  ]
+}
