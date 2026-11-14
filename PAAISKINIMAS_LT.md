@@ -93,7 +93,7 @@ Duomenų bazės struktūra: `tasks(id INTEGER PRIMARY KEY, title TEXT NOT NULL, 
 
 Užduotyje reikalaujama **2–5 studentų**, skirtingų vaidmenų ir kiekvieno autoriaus atskirų commit. Šiame projekte šiuo metu dirba **vienas žmogus**, todėl negaliu sąžiningai nurodyti kitų studentų ar sukurti jų commit. Galimas vaidmenų pasiskirstymas, kai atsiras komanda: kūrėjas – PHP ir duomenų bazė; QA – Postman bei automatiniai testai; analitikas – OpenAPI ir reikalavimų patikra. Vienas asmuo gali turėti kelis vaidmenis, bet reikia bent dviejų tikrų komandos narių, kad būtų įvykdyta ši sąlyga.
 
-Kodas kurtas atskiroje `codex/task-api` šakoje ir sujungtas į `master`. Komandos užduotys registruojamos GitHub repozitorijos **Issues** sąraše. GitHub Projects lentai reikalingas papildomas `project` prisijungimo leidimas, kurio dabartinis prisijungimas neturi. Jį suteikus, šiuos Issues galima perkelti į Projects lentą. Jei prisijungs kitas studentas, jis turėtų sukurti **savo šaką**, atlikti savo darbą ir sukurti **savo commit**, po to šaką sujungti į `master`.
+Kodas kurtas atskiroje `codex/task-api` šakoje ir sujungtas į `master`. [Viešoje GitHub Projects lentoje](https://github.com/users/vaidotassackus/projects/1/views/1) yra keturios su repozitorijos Issues susietos užduotys: trys atliktos, o antro komandos nario peržiūra laukia. Jei prisijungs kitas studentas, jis turėtų sukurti **savo šaką**, atlikti savo darbą ir sukurti **savo commit**, po to šaką sujungti į `master`.
 
 ## Kas šiame variante ribota
 

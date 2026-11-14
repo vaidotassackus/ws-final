@@ -9,3 +9,5 @@ php -S 127.0.0.1:8000 -t public public/index.php
 ```
 
 Tada atidaryk <http://127.0.0.1:8000/tasks>. Testai: `php tests/run.php`.
+
+[Užduočių lenta](https://github.com/users/vaidotassackus/projects/1/views/1) · [OpenAPI aprašas](openapi.yaml) · [Postman kolekcija](postman_collection.json)
