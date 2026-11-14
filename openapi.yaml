@@ -1,0 +1,162 @@
+openapi: 3.0.3
+info:
+  title: Užduočių REST API
+  version: 1.0.0
+  description: Paprastas PHP ir SQLite užduočių API.
+servers:
+  - url: http://127.0.0.1:8000
+paths:
+  /:
+    get:
+      summary: API pradžia
+      responses:
+        '200':
+          description: Nuoroda į užduočių sąrašą
+          headers:
+            ETag:
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { type: object }
+  /tasks:
+    get:
+      summary: Visos užduotys
+      parameters:
+        - in: header
+          name: If-None-Match
+          schema: { type: string }
+          description: Ankstesnio atsakymo ETag reikšmė.
+      responses:
+        '200':
+          description: Sąrašas su nuorodomis
+          headers:
+            ETag:
+              schema: { type: string }
+            Cache-Control:
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Task' }
+                  _links: { $ref: '#/components/schemas/Links' }
+        '304':
+          description: Sąrašas nepasikeitė
+    post:
+      summary: Sukurti užduotį
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TaskInput' }
+            example: { title: Pirkti pieno, done: false }
+      responses:
+        '201':
+          description: Užduotis sukurta
+          headers:
+            Location:
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Task' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /tasks/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: integer, minimum: 1 }
+    get:
+      summary: Viena užduotis
+      parameters:
+        - in: header
+          name: If-None-Match
+          schema: { type: string }
+      responses:
+        '200':
+          description: Užduotis su veiksmų nuorodomis
+          headers:
+            ETag:
+              schema: { type: string }
+            Cache-Control:
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Task' }
+        '304': { description: Užduotis nepasikeitė }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      summary: Pakeisti visą užduotį
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TaskInput' }
+      responses:
+        '200':
+          description: Pakeista užduotis
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Task' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+    delete:
+      summary: Ištrinti užduotį
+      responses:
+        '204': { description: Užduotis ištrinta }
+        '404': { $ref: '#/components/responses/NotFound' }
+components:
+  schemas:
+    TaskInput:
+      type: object
+      required: [title]
+      additionalProperties: false
+      properties:
+        title: { type: string, minLength: 1, maxLength: 120 }
+        done: { type: boolean, default: false }
+    Task:
+      type: object
+      required: [id, title, done, _links]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        done: { type: boolean }
+        _links: { $ref: '#/components/schemas/Links' }
+    Links:
+      type: object
+      additionalProperties:
+        type: object
+        properties:
+          href: { type: string }
+          method: { type: string }
+    Error:
+      type: object
+      properties:
+        error: { type: string }
+    ValidationErrors:
+      type: object
+      properties:
+        errors:
+          type: array
+          items: { type: string }
+  responses:
+    BadRequest:
+      description: Netaisyklingas JSON
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Užduotis nerasta
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    ValidationError:
+      description: Netinkami duomenys
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ValidationErrors' }
