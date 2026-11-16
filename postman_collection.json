@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Užduočių REST API",
-    "description": "Paleiskite PHP serverį ir vykdykite užklausas iš eilės.",
+    "description": "Paleiskite PHP serverį ir vykdykite užklausas iš eilės. Viena užduotis sukuriama ir galiausiai ištrinama.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [{ "key": "baseUrl", "value": "http://127.0.0.1:8000" }],
@@ -34,7 +34,26 @@
       "request": { "method": "GET", "url": "{{baseUrl}}/tasks/{{taskId}}" },
       "event": [{
         "listen": "test",
-        "script": { "type": "text/javascript", "exec": ["pm.test('Rasta: 200', () => pm.response.to.have.status(200));"] }
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('Rasta: 200', () => pm.response.to.have.status(200));",
+            "pm.test('Yra veiksmų nuorodos', () => pm.expect(pm.response.json()._links).to.have.property('delete'));",
+            "pm.collectionVariables.set('etag', pm.response.headers.get('ETag'));"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "Nepasikeitė (ETag)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "If-None-Match", "value": "{{etag}}" }],
+        "url": "{{baseUrl}}/tasks/{{taskId}}"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": ["pm.test('Nepasikeitė: 304', () => pm.response.to.have.status(304));"] }
       }]
     },
     {
@@ -44,7 +63,23 @@
         "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": { "mode": "raw", "raw": "{\"title\":\"Pirkti duonos\",\"done\":true}" },
         "url": "{{baseUrl}}/tasks/{{taskId}}"
-      }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": ["pm.test('Pakeista: 200', () => pm.response.to.have.status(200));"] }
+      }]
+    },
+    {
+      "name": "Senas ETag nebegalioja",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "If-None-Match", "value": "{{etag}}" }],
+        "url": "{{baseUrl}}/tasks/{{taskId}}"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": ["pm.test('Pakeisti duomenys: 200', () => pm.response.to.have.status(200));"] }
+      }]
     },
     {
       "name": "Ištrinti",
@@ -52,6 +87,14 @@
       "event": [{
         "listen": "test",
         "script": { "type": "text/javascript", "exec": ["pm.test('Ištrinta: 204', () => pm.response.to.have.status(204));"] }
+      }]
+    },
+    {
+      "name": "Ištrinta užduotis nerandama",
+      "request": { "method": "GET", "url": "{{baseUrl}}/tasks/{{taskId}}" },
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": ["pm.test('Nerasta: 404', () => pm.response.to.have.status(404));"] }
       }]
     }
   ]
